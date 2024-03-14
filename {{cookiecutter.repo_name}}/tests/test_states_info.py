@@ -26,3 +26,4 @@ def test__is_city_capitol_of_state(city_name: str, state: str, is_capitol: bool)
 def test__slow_add():
     """Test `slow_add()`."""
     assert slow_add(1, 2) == 3
+

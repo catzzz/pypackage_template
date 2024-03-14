@@ -19,8 +19,10 @@ def project_dir() -> Path:
     template_values = {"repo_name": "test-repo"}
     print("Setup")
     generated_repo_dir = generate_project(template_values=template_values)
-    initialize_git_repo(generated_repo_dir)
-    subprocess.run(["make", "lint-ci"], cwd=generated_repo_dir, check=False)
-    yield generated_repo_dir
-    shutil.rmtree(generated_repo_dir)
-    print("Teardown")
+    try:
+        initialize_git_repo(generated_repo_dir)
+        subprocess.run(["make", "lint-ci"], cwd=generated_repo_dir, check=False)
+        yield generated_repo_dir
+    finally:
+        shutil.rmtree(path=generated_repo_dir)
+        print("Teardown")
