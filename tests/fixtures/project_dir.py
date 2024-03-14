@@ -27,6 +27,10 @@ def project_dir() -> Path:
         yield generated_repo_dir
     finally:
         shutil.rmtree(path=generated_repo_dir)
+        # remove config file
+        config_file = Path(f"cookiecutter-{test_session_id}.json")
+        if config_file.exists():
+            config_file.unlink()
         print("Teardown")
 
 
