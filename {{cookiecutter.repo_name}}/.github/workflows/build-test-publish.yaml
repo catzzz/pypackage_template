@@ -110,7 +110,7 @@ jobs:
           /bin/bash -x run.sh publish:test
         env:
           TEST_PYPI_TOKEN: {% raw %}${{ secrets.TEST_PYPI_TOKEN }}{% endraw %}
-          
+
       - name: Publish to Prod PyPI
         run: |
           /bin/bash -x run.sh publish:prod

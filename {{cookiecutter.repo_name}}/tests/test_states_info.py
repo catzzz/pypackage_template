@@ -2,16 +2,13 @@
 
 
 import pytest
-
 from example_pkg.states_info import (
-    
     is_city_capitol_of_state,
     slow_add,
 )
 
 
 @pytest.mark.parametrize(
-    
     argnames=("city_name", "state", "is_capitol"),
     argvalues=[
         ("Montgomery", "Alabama", True),
@@ -20,11 +17,9 @@ from example_pkg.states_info import (
         ("Salt Lake City", "Alabama", False),
     ],
 )
-def test__is_city_capitol_of_state(city_name: str, 
-                                   state: str, is_capitol: bool):
+def test__is_city_capitol_of_state(city_name: str, state: str, is_capitol: bool):
     """Test `is_city_capitol_of_state()`."""
-    assert is_city_capitol_of_state(city_name=city_name, state=state) \
-        == is_capitol
+    assert is_city_capitol_of_state(city_name=city_name, state=state) == is_capitol
 
 
 @pytest.mark.slow
