@@ -16,9 +16,7 @@ def initialize_git_repo(repo_dir: Path):
     # commit the contents to the 'main' branch
     subprocess.run(["git", "branch", "-M", "main"], cwd=repo_dir, check=True)
     subprocess.run(["git", "add", "--all"], cwd=repo_dir, check=True)
-    subprocess.run(["git", "commit", "-m", "'feat: initial commit by pytest'"],
-                    cwd=repo_dir, check=True)
-
+    subprocess.run(["git", "commit", "-m", "'feat: initial commit by pytest'"], cwd=repo_dir, check=True)
 
 
 def generate_project(template_values: Dict[str, str], test_session_id: str):
