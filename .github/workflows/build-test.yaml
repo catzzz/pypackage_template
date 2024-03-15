@@ -1,4 +1,4 @@
-name: Build, Test, and Publish
+name: Build, Test
 
 on:
   pull_request:
@@ -7,12 +7,6 @@ on:
     branches:
       - main
   workflow_dispatch:
-    inputs:
-      publish_to_main:
-        description: Publish to PyPI if tests successful
-        required: true
-        type: boolean
-        default: false
 
 jobs:
 
@@ -41,29 +35,7 @@ jobs:
         run: |
           /bin/bash -x run.sh lint:ci
 
-  build-wheel-and-sdist:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Set up Python 3.8
-        uses: actions/setup-python@v3
-        with:
-          python-version: 3.8
-      - name: Install build CLI
-        run: |
-          pip install build
-      - name: Build python package
-        run: |
-          /bin/bash -x run.sh build
-      - name: Upload wheel and sdist
-        uses: actions/upload-artifact@v3
-        with:
-          name: wheel-and-sdist
-          path: ./dist/*
-
   execute-tests:
-    needs:
-      - build-wheel-and-sdist
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -71,22 +43,20 @@ jobs:
         uses: actions/setup-python@v3
         with:
           python-version: 3.8
-      - name: Download wheel and sdist
-        uses: actions/download-artifact@v3
-        with:
-          name: wheel-and-sdist
-          path: ./dist/
+      - name: Configure git CLI
+        run: |
+            git config --global user.email "git-bot-user@python-course.com"
+            git config --global user.name "phitoduck"
       - name: Install test dependencies
         run: |
-          pip install pytest pytest-cov ./dist/*.whl
-      - name: Lint, Format, and other static code quality checks
+          make install
+      - name: Run tests
         run: |
-          /bin/bash -x run.sh test:ci
+          make test
 
-  publish:
+  push-tags:
     needs:
       - execute-tests
-      - build-wheel-and-sdist
       - lint-format-and-static-code-checks
       - check-version-txt
     runs-on: ubuntu-latest
@@ -97,24 +67,6 @@ jobs:
         uses: actions/setup-python@v3
         with:
           python-version: 3.8
-      - name: Download wheel and sdist
-        uses: actions/download-artifact@v3
-        with:
-          name: wheel-and-sdist
-          path: ./dist/
-      - name: Install twine
-        run: |
-          pip install twine
-      # - name: Publish to TestPyPI
-      #   run: |
-      #     /bin/bash -x run.sh publish:test
-      #   env:
-      #     TEST_PYPI_TOKEN: {% raw %}${{ secrets.TEST_PYPI_TOKEN }}{% endraw %}
-      # - name: Publish to Prod PyPI
-      #   run: |
-      #     /bin/bash -x run.sh publish:prod
-      #   env:
-      #     PROD_PYPI_TOKEN: {% raw %}${{ secrets.PROD_PYPI_TOKEN }}{% endraw %}
       - name: Push tags
         run: |
           git push origin --tags

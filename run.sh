@@ -7,8 +7,9 @@ THIS_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 # install core and development Python dependencies into the currently activated venv
 function install {
     python -m pip install --upgrade pip
-    python -m pip install cookiecutter pytest 
+    python -m pip install cookiecutter pytest pre-commit
 }
+
 
 # generate a new project from this template
 function generate-project {
@@ -61,6 +62,36 @@ function help {
     echo "Tasks:"
     compgen -A function | cat -n
 }
+
+
+
+
+function lint {
+    pre-commit run --all-files
+}
+
+# same as `lint` but with any special considerations for CI
+function lint:ci {
+    # We skip no-commit-to-branch since that blocks commits to `main`.
+    # All merged PRs are commits to `main` so this must be disabled.
+    SKIP=no-commit-to-branch pre-commit run --all-files
+}
+
+# execute tests that are not marked as `slow`
+function test:quick {
+    run-tests -m "not slow" ${@:-"$THIS_DIR/tests/"}
+}
+
+
+
+# (example) ./run.sh test tests/test_states_info.py::test__slow_add
+function run-tests {
+
+    python -m pytest ${@:-"$THIS_DIR/tests/"}
+
+    return $PYTEST_EXIT_STATUS
+}
+
 
 TIMEFORMAT="Task completed in %3lR"
 time ${@:-help}
